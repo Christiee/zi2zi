@@ -137,7 +137,7 @@ class UNet(object):
     def discriminator(self, image, is_training, reuse=False):
         with tf.variable_scope("discriminator"):
             if reuse:
-                tf.get_variable_scope().reuse_variables()
+                tf.compat.v1.get_variable_scope().reuse_variables()
             h0 = lrelu(conv2d(image, self.discriminator_dim, scope="d_h0_conv"))
             h1 = lrelu(batch_norm(conv2d(h0, self.discriminator_dim * 2, scope="d_h1_conv"),
                                   is_training, scope="d_bn_1"))
@@ -153,7 +153,7 @@ class UNet(object):
             return tf.nn.sigmoid(fc1), fc1, fc2
 
     def build_model(self, is_training=True, inst_norm=False, no_target_source=False):
-        real_data = tf.placeholder(tf.float32,
+        real_data = tf.compat.v1.placeholder(tf.float32,
                                    [self.batch_size, self.input_width, self.input_width,
                                     self.input_filters + self.output_filters],
                                    name='real_A_and_B_images')
@@ -515,8 +515,8 @@ class UNet(object):
         total_batches = data_provider.compute_total_batch_num(self.batch_size)
         val_batch_iter = data_provider.get_val_iter(self.batch_size)
 
-        saver = tf.train.Saver(max_to_keep=3)
-        summary_writer = tf.summary.FileWriter(self.log_dir, self.sess.graph)
+        saver = tf.compat.v1.train.Saver(max_to_keep=3)
+        summary_writer = tf.compat.v1.summary.FileWriter(self.log_dir, self.sess.graph)
 
         if resume:
             _, model_dir = self.get_model_id_and_dir()
